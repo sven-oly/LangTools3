@@ -40,3 +40,8 @@ def root():
     store_visit(request.remote_addr, request.user_agent)
     visits = fetch_visits(10)
     return render_template('index.html', visits=visits)
+
+@app.route('/t2/')
+def t2():
+    'test 2nd option'
+    return render_template('ind2.html')
