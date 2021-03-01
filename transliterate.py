@@ -196,7 +196,7 @@ class Phase():
 def extractShortcuts(ruleString):
   # Shortcuts are clauses of the form "$id = re;  What about a literal ";?
   # also remove comment lines and blank lines
-  shorcut_pattern = '(\$\w+)\s*=\s*([^;]*)'
+  shorcut_pattern = re.compile('(\$\w+)\s*=\s*([^;]*)')
   matches = re.findall(shorcut_pattern, ruleString)
 
   shortcuts = {}
@@ -216,10 +216,12 @@ def extractShortcuts(ruleString):
 
 def expandShortcuts(shortcuts, inlist):
   newlist = inlist
+  rev_sort_keys = sorted(shortcuts.keys(), reverse=True)  # To match longest patterns first
   if shortcuts:
-    for key, value in shortcuts.items():
-      key = re.sub('\$', '\$', key)
-      sublist = re.sub(key, value, newlist)
+    for key in rev_sort_keys:
+      value = shortcuts[key]
+      subkey = re.sub('\$', '\$', key)
+      sublist = re.sub(subkey, value, newlist)
       newlist = sublist
   return newlist
 
@@ -348,6 +350,7 @@ class Transliterate():
     self.limit = len(instring) - 1
     this_phase = self.phaseList[index]
     ruleList = this_phase.RuleList
+    matching_rules_data = []
     try:
       if debug:
         print('---------------applyPhase line 316  phase %s, instring = >%s<' % (index, instring.encode('utf-8')))
@@ -389,7 +392,7 @@ class Transliterate():
           if debug:
             print('MATCHING Rule in phase %s= %s --> %s. current = %s' % (
               index, rule.pattern, rule.subst, current_string))
-
+          matching_rules_data.append([index, current_string, rule.pattern, rule.subst])
           # Size of last part of old string after the replacement
           c_size = len(current_string) - match_obj.end(0) - self.start  # Last part of old string not matched
           if not rule.before_reposition:
@@ -462,7 +465,7 @@ class Transliterate():
 
     if debug:
       print('OUTPUT Phase %s = %s' % (index, current_string))
-    return current_string
+    return current_string, matching_rules_data
 
   def transliterate(self, instring, debug=None):
     # Apply each phase to the incoming string or string list.
@@ -483,13 +486,16 @@ class Transliterate():
         print('---------------transliterate line 425  phase %d = >%s<' % (phase_index, self.phaseList))
         print('---------------transliterate line 426  instring = >%s<' % (instring))
       outstring = u'NOT SET'
-      outstring = self.applyPhase(phase_index, instring, debug)
       try:
-        outstring = self.applyPhase(phase_index, instring, debug)
+        outstring, matching_rules_data = self.applyPhase(phase_index, instring, debug)
       except:
         e = sys.exc_info()[0]
         logging.error('!! Calling applyPhase Error e = %s. phase_index =%s, instring = %s' %
                       (e, phase_index, instring))
+      if matching_rules_data:
+        if debug:
+          print('** Updated:\n  %s\n  %s' % (instring, outstring))
+          print('  Applied = %s' % matching_rules_data)
       instring = outstring
 
     # ?? .decode('unicode-escape')

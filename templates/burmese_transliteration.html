@@ -14,28 +14,35 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    <style>
-on
-    </style>
-
   <link rel="stylesheet" type="text/css" href="/css/fonts.css">
 
-    <style>
-     {% for font in font_list %}
-      .{{font.family}} {
-      font-family: "{{font.family}},Arial";
-      font-size:18px;
-      }
-      {% endfor %}
+  <style>
+   {% for font in font_list %}
+    @font-face{
+      font-family:"{{font.family}}";
+      src:url("{{font.source}}");
+      font-weight:normal;
+      font-style:normal;
+    }
+    {% endfor %}
+  </style>
 
-      .default-font {
-      font-family: "Arial,Helvetica";
-      font-size:12px;
-      }
+  <style>
+   {% for font in font_list %}
+    .{{font.family}} {
+    font-family: "{{font.family}},Arial";
+    font-size:18px;
+    }
+    {% endfor %}
 
-    input {font-size:18px;}
-    textarea {font-size:18px; resize: vertical;}
-    </style>
+    .default-font {
+    font-family: "Arial,Helvetica";
+    font-size:12px;
+    }
+
+  input {font-size:18px;}
+  textarea {font-size:18px; resize: vertical; rows:4;}
+  </style>
 
   <script src="/js/keyboard.js"></script>
 
@@ -211,6 +218,7 @@ function toggleConvertedVS(text_area_id, toggle) {
 
   <script type="text/javascript">
     function setTranslitOption(selector) {
+      requestTransliterate('t1', 'outputarea', 'rulearea', 'messagearea', 'summaryarea', 'translit_selector');
     }
   </script>
   <link rel="stylesheet" type="text/css" href="/css/keyboard.css" />
@@ -260,7 +268,7 @@ function toggleConvertedVS(text_area_id, toggle) {
 
   <!-- If an original encoding area is needed. -->
   {% if encoded_div %} 
-  <textarea id="encodeArea" class='default-font' style="width:600px;height:300px;"
+  <textarea id="encodeArea" class='default-font' style="width:600px;height:200px;"
             rows="10" dir="{{direction}}" spellcheck="false"></textarea>
   <br />
   <input type="button" value="Convert to Unicode text"
@@ -269,7 +277,7 @@ function toggleConvertedVS(text_area_id, toggle) {
   {% endif %}
 
   <div id="t1_div">
-    <textarea id="t1" style="width:600px;font-family:{{font_list.0.family}};resize:vertical;"
+    <textarea id="t1" style="width:600px;height:100px;font-family:{{font_list.0.family}};resize:vertical;"
       rows="4" spellcheck="false"
       style="font-size:18px;"
       dir="{{direction}}">{{test_data}}</textarea>
@@ -288,7 +296,7 @@ function toggleConvertedVS(text_area_id, toggle) {
       </select>
       </div>
     <br/>
-    <textarea id="outputarea" spellcheck="false" rows="2" columns="15"></textarea>
+    <textarea id="outputarea" spellcheck="false" style="width:600px;height:100px;"></textarea>
     <textarea style="display:none;" id="rulearea" spellcheck="false" columns="15"></textarea>
     <textarea style="display:none;" id="messagearea" spellcheck="false" columns="15"></textarea>
     <textarea style="display:none;"id="summaryarea" spellcheck="false" columns="15"></textarea>

@@ -39,7 +39,7 @@ $independent = [\u1000-\u102A \u103F \u104C-\u104F \u1050-\u1055];
 $creaky = \u0330;
 $high = \u0301;
 $low = \u0300;
-#$coda = [$creaky $high $low -h ou' a];  # TODO: remove if unused
+#$coda = [$creaky $high $low ɴ ou' a];  # TODO: remove if unused
 
 #
 # Preprocessing
@@ -91,35 +91,35 @@ $asat ($visarga)? [\u1000-\u102A] { $asat → ;
 
 ဂ် → ehou';  # in မဂ္ဂဇင်း ~ မဂ်ဂဇင်း /mɛou'.ɡa.zɪ́-h/
 
-င့် → ɪ $creaky -h;
-င်း → ɪ $high -h;
-င် → ɪ $low -h;
+င့် → ɪ $creaky ɴ;
+င်း → ɪ $high ɴ;
+င် → ɪ $low ɴ;
 
 စ် → ɪou';  # maybe sometimes /eɪ̯ou'/
 
-ဉ့် → ɪ $creaky -h;
-ဉ်း → ɪ $high -h;
-ဉ် → ɪ $low -h;
+ဉ့် → ɪ $creaky ɴ;
+ဉ်း → ɪ $high ɴ;
+ဉ် → ɪ $low ɴ;
 
-ည့် → eh $creaky;
-ည်း → eh $high;
-ည် → eh $low;
+ည့် → e $creaky h
+ည်း → e $high h;
+ည် → e $low h;
 
-ဏ့် → a $creaky -h;
-ဏ်း → a $high -h;
-ဏ် → a $low -h;
+ဏ့် → a $creaky ɴ;
+ဏ်း → a $high ɴ;
+ဏ် → a $low ɴ;
 
 တ် → aou';
 
-န့် → a $creaky -h;
-န်း → a $high -h;
-န် → a $low -h;
+န့် → a $creaky ɴ;
+န်း → a $high ɴ;
+န် → a $low ɴ;
 
 ပ် → aou';
 
-မ့် → a $creaky -h;
-မ်း → a $high -h;
-မ် → a $low -h;
+မ့် → a $creaky ɴ;
+မ်း → a $high ɴ;
+မ် → a $low ɴ;
 
 ယ့် → eh $creaky;
 ယ်း → eh $high;
@@ -127,16 +127,16 @@ $asat ($visarga)? [\u1000-\u102A] { $asat → ;
 
 သ် → aou';
 
-$vs_aa ဉ့် → ɪ $creaky -h;
-$vs_aa ဉ်း → ɪ $high -h;
-$vs_aa ဉ် → ɪ $low -h;
+$vs_aa ဉ့် → ɪ $creaky ɴ;
+$vs_aa ဉ်း → ɪ $high ɴ;
+$vs_aa ဉ် → ɪ $low ɴ;
 $vs_aa တ် → aou';
-$vs_aa ဏ့် → a $creaky -h;
-$vs_aa ဏ်း → a $high -h;
-$vs_aa ဏ် → a $low -h;
-$vs_aa န့် → a $creaky -h;
-$vs_aa န်း → a $high -h;
-$vs_aa န် → a $low -h;
+$vs_aa ဏ့် → a $creaky ɴ;
+$vs_aa ဏ်း → a $high ɴ;
+$vs_aa ဏ် → a $low ɴ;
+$vs_aa န့် → a $creaky ɴ;
+$vs_aa န်း → a $high ɴ;
+$vs_aa န် → a $low ɴ;
 $vs_aa ပ် → aou';  # in ကလာပ်စည်း /ka.laou'.sɛ́/ (club cell)
 $vs_aa ယ့် → eh $creaky;
 $vs_aa ယ်း → eh $high;
@@ -177,6 +177,7 @@ $vs_ii ့ → i $creaky;  # this does not usually occur
 $vs_ii း → i $high;
 $vs_ii → i $low;
 
+
 $vs_u က် → ou̯ou';
 $vs_u ဂ် → ou̯ou';
 $vs_u ဏ့် → ou $creaky ʊ̯-h;
@@ -212,22 +213,26 @@ $vs_e ့ → ei $creaky;
 $vs_e း → ei $high;
 $vs_e → ei $low;
 
-$vs_ai ့ → eh $creaky;
-$vs_ai း → eh $high;  # redundant high tone; this does not usually occur
-$vs_ai → eh $high;
+# $vs_ai ့ → eh $creaky;
+# $vs_ai း → eh $high;  # redundant high tone; this does not usually occur
+# $vs_ai → eh $high;
+\u1032 ့ → eh $creaky;
+\u1032 း → eh $high;  # redundant high tone; this does not usually occur
+\u1032 → eh $high;
 
-$anusvara ့ → a $creaky -h;
-$anusvara း → a $high -h;
-$anusvara → a $low -h;
+
+$anusvara ့ → a $creaky ɴ;
+$anusvara း → a $high ɴ;
+$anusvara → a $low ɴ;
 
 $med_w တ် → ʊou';
-$med_w န့် → ʊ $creaky -h;
-$med_w န်း → ʊ $high -h;
-$med_w န် → ʊ $low -h;
+$med_w န့် → ʊ $creaky ɴ;
+$med_w န်း → ʊ $high ɴ;
+$med_w န် → ʊ $low ɴ;
 $med_w ပ် → ʊou';
-$med_w မ့် → ʊ $creaky -h;
-$med_w မ်း → ʊ $high -h;
-$med_w မ် → ʊ $low -h;
+$med_w မ့် → ʊ $creaky ɴ;
+$med_w မ်း → ʊ $high ɴ;
+$med_w မ် → ʊ $low ɴ;
 
 #
 # Medials
@@ -332,10 +337,10 @@ $med_w မ် → ʊ $low -h;
 န → n-;
 
 # Labials
-ပ → p-eh;
-ဖ → hp-eh;
-ဗ → b-eh;
-ဘ → b-eh;
+ပ → p-;
+ဖ → hp-;
+ဗ → b-;
+ဘ → b-;
 မ → m-;
 
 # Other letters
@@ -580,9 +585,12 @@ $vs_i $anusvara း → e $high ɪ̯ɴ;
 $vs_i $anusvara → e $low ɪ̯ɴ;
 $vs_i → i $creaky;
 
-$vs_ii ့ → i $creaky;  # this does not usually occur
-$vs_ii း → i $high;
-$vs_ii → i $low;
+# $vs_ii ့ → i $creaky;  # this does not usually occur
+# $vs_ii း → i $high;
+# $vs_ii → i $low;
+\u102e ့ → i $creaky;  # this does not usually occur
+\u102e း → i $high;
+\u102e → i $low;
 
 $vs_u က် → oʊ̯ʔ;
 $vs_u ဂ် → oʊ̯ʔ;
@@ -602,9 +610,12 @@ $vs_u $anusvara း → o $high ʊ̯ɴ;
 $vs_u $anusvara → o $low ʊ̯ɴ;
 $vs_u → u $creaky;
 
-$vs_uu ့ → u $creaky;  # this does not usually occur
-$vs_uu း → u $high;
-$vs_uu → u $low;
+# $vs_uu ့ → u $creaky;  # this does not usually occur
+# $vs_uu း → u $high;
+# $vs_uu → u $low;
+\u1030 ့ → u $creaky;  # this does not usually occur
+\u1030 း → u $high;
+\u1030 → u $low;
 
 $vs_e တ် → ɪʔ;
 $vs_e $vs_aa က် → aʊ̯ʔ;

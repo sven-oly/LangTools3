@@ -48,7 +48,12 @@ unicode_font_list = [
         'source': '/fonts/Myanmar/NotoSansMyanmar-Regular.ttf',
     },
     {
-        'family': 'NotoSerifsMyanmar',
+        'family': 'Padauk',
+        'longName': 'Padauk',
+        'source': '/    fonts/Myanmar/Padauk-Regular.ttf',
+    },
+    {
+        'family': 'NotoSerifMyanmar',
         'longName': 'Noto Serif Myanmar',
         'source': '/fonts/Myanmar/NotoSerifMyanmar-Regular.ttf',
     },
@@ -58,9 +63,29 @@ unicode_font_list = [
         'source': '/fonts/Myanmar/NotoSansMyanmar-Light.ttf',
     },
     {
-        'family': 'NotoSerifsMyanmarLight',
+        'family': 'NotoSerifMyanmarLight',
         'longName': 'Noto Serif Myanmar Light',
         'source': '/fonts/Myanmar/NotoSerifMyanmar-Light.ttf',
+    },
+    {
+        'family': 'NotoSansMyanmarThin',
+        'longName': 'Noto Sans Myanmar Thin',
+        'source': '/fonts/Myanmar/NotoSansMyanmar-Thin.ttf',
+    },
+    {
+        'family': 'NotoSerifMyanmarThin',
+        'longName': 'Noto Serif Myanmar Thin',
+        'source': '/fonts/Myanmar/NotoSerifMyanmar-Thin.ttf',
+    },
+    {
+        'family': 'NotoSansMyanmarMedium',
+        'longName': 'Noto Sans Myanmar Medium',
+        'source': '/fonts/Myanmar/NotoSansMyanmar-Medium.ttf',
+    },
+    {
+        'family': 'NotoSerifMyanmarMedium',
+        'longName': 'Noto Serif Myanmar Medium',
+        'source': '/fonts/Myanmar/NotoSerifMyanmar-Medium.ttf',
     },
 ]
 
@@ -78,9 +103,9 @@ def t2():
 LanguageCode = 'my'
 Language = 'Burmese'
 kb_list = [
-    {'shortName':  LanguageCode,
+    {'shortName': LanguageCode,
      'longName': Language,
-     'instructions': 'Burmese kb howto'
+     'instructions': ''
      }
 ]
 
