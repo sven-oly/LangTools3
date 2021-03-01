@@ -1,1 +1,15 @@
-runtime: python38
+runtime: python37
+
+handlers:
+- url: /css/*
+  static_dir: css
+
+- url: /js/*
+  static_dir: js
+
+- url: /layouts/*
+  static_dir: layouts
+
+- url: /fonts/*
+  static_dir: fonts
+

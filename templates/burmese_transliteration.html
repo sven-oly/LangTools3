@@ -1,0 +1,344 @@
+<!--<!DOCTYPE html>-->
+<!-- saved from url=(0052)https://x20web.corp.google.com/~shuchen/vk/demo.html -->
+<html><head>
+    <title>Burmese transliteration explorer</title>
+    
+
+  <link rel="stylesheet" href="/css/blueprint/screen.css" type="text/css" media="screen">
+  <link rel="stylesheet" href="/css/blueprint/print.css" type="text/css" media="print"> 
+
+  <!--[if lt IE 8]>
+    <link rel="stylesheet" href="/css/blueprint/ie.css" type="text/css" media="screen, projection">
+  <![endif]-->
+    
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <style>
+on
+    </style>
+
+  <link rel="stylesheet" type="text/css" href="/css/fonts.css">
+
+    <style>
+     {% for font in font_list %}
+      .{{font.family}} {
+      font-family: "{{font.family}},Arial";
+      font-size:18px;
+      }
+      {% endfor %}
+
+      .default-font {
+      font-family: "Arial,Helvetica";
+      font-size:12px;
+      }
+
+    input {font-size:18px;}
+    textarea {font-size:18px; resize: vertical;}
+    </style>
+
+  <script src="/js/keyboard.js"></script>
+
+  <script src="/js/utils.js"></script>
+  <script src="/js/vk-debug.js"></script>
+{% if variation_sequence %}
+  <script src="/js/{{langTag}}Converter.js"></script>
+{% endif %}
+
+  <!-- JavaScript for keyboard setup, etc.
+       TODO: move some of this to .js files.
+       -->
+
+  <script>
+
+  var kb_info = {
+    {% for kb in kb_list %}{{kb.shortName}}: ["{{kb.shortName}}", "{{kb.longName}}", "{{kb.instructions}}" ],{%endfor%}
+  };
+  var font_list = [
+    {% for font in font_list %}"{{font.family}}",{% endfor %}
+  ]
+  ;
+
+  // For loading keyboard.
+  var k = { loadme: Object};
+  k.loadme.prototype = function(a) {
+  return a;
+  }
+  var e = {keyboard: k};
+  var google = {elements: e};
+
+  var diff_list = [];  // needed for utils.js
+
+  // For the keyboard.
+  var controller = null;
+
+  function onPageLoaded() {
+    var input = document.getElementById('t1');
+
+    controller = initializeKeyboard(input, kb_info, font_list);
+
+    onSizeSelected(document.getElementById("sizeSelector").value, 't1');
+    input.focus();
+
+    var selector = document.getElementById("setLayout");
+    onLayoutSelected(selector.value);
+
+    setFontFamily(document.getElementById("fontSelector").value);
+  }
+
+    function onLayoutSelected(layoutCode) {
+      controller.activateLayout(layoutCode);
+        var info = kb_info[layoutCode];
+        if (info != null) {
+            var area = document.getElementById("kb_instructions");
+            if (area) {
+                area.innerHTML = area.value = info[1];
+            }
+        }
+    }
+
+    function clearText() {
+      var field = document.getElementById('t1');
+      field.value = '';
+      field = document.getElementById('codepoints');
+      field.value = '';
+      document.getElementById('t1').focus();
+    }
+
+    function showCodePoints() {
+      var src_field = document.getElementById('t1');
+      var code_text = uplus(src_field.value);
+      var dest_field = document.getElementById('codepoints');
+      dest_field.value = code_text;
+      document.getElementById('t1').focus();
+    }
+
+    function setKeyCapsFont(newFontFamily) {
+      var keycaps = document.getElementsByClassName("vk-cap");
+      for (var i = 0; i < keycaps.length; i++ ) {
+        keycaps[i].style.fontFamily = newFontFamily;
+      }
+    }
+
+    function setFontFamily(newFontFamily) {
+      setKeyCapsFont(newFontFamily);
+
+      var t1_element = document.getElementById('t1');
+      t1_element.className = newFontFamily;
+      t1_element.style.fontFamily = newFontFamily; //  + ",Arial";
+    }
+
+    function onLanguageSelected(newLangTag, textArea) {
+      var t1_element = document.getElementById(textArea);
+      t1_element.lang = newLangTag;
+    }
+
+    function onSizeSelected(newSize, textArea) {
+      var t1_element = document.getElementById(textArea);
+      t1_element.style.fontSize = newSize;
+    }
+
+    // Keyboard info.
+    var kb_info = {
+      {% for kb in kb_list %}{{kb.shortName}}: ["{{kb.longName}}", "{{kb.instructions}}" ],{%endfor%}
+    };
+
+{% if variation_sequence %}
+function toggleConvertedVS(text_area_id, toggle) {
+  // TODO: Change variation sequence content of text.
+  var text_area = document.getElementById(text_area_id);
+
+  var text = text_area.value;
+  var new_text;
+  if (toggle.checked) {
+      new_text = add_variation_modifiers(text);
+  } else {
+      new_text =remove_variation_modifiers(text);
+  }
+  text_area.innerHTML = text_area.value = new_text;
+}
+{% endif %}
+  </script>
+
+  <!-- JavaScript for XHTML with server side -->
+  <script type="text/javascript" >
+
+  function requestTransliterate(inputarea, outputarea, rulearea, messagearea, summaryarea, translit_selector) {
+    // Prepare for the call to the backendvar xmlhttp;
+	if (window.XMLHttpRequest) { // code for IE7+, Firefox, Chrome, Opera, Safari
+	  xmlhttp=new XMLHttpRequest();
+	} else { // code for IE6, IE5
+	  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	}
+
+    // Deal with the results
+    xmlhttp.onreadystatechange=function() {
+	  if(xmlhttp.readyState==4) {
+	    var returned_json = xmlhttp.responseText;
+		var json_obj = JSON.parse(returned_json);
+
+        var outputObj = document.getElementById(outputarea);
+        var messageObj = document.getElementById(messagearea);
+        var transliteratorSummaryObj = document.getElementById(summaryarea);
+
+        if (json_obj.error) {
+          // Warn, and don't change values.
+          alert(json_obj.error);
+          return;
+        }
+        messageObj.value = messageObj.innerHTML = json_obj.message;
+        outputObj.value = outputObj.innerHTML = json_obj.outText;
+        transliteratorSummaryObj. value = json_obj.summary;
+      }
+    }
+
+	// Set up the call
+    var inputObj = document.getElementById(inputarea);
+    var inputtext = escape(inputObj.value);
+    var encodedInput = encodeURIComponent(inputObj.value);
+    var ruleObj = document.getElementById(rulearea);
+    var ruletext = escape(ruleObj.value);
+    var translit_type = document.getElementById(translit_selector).value;
+
+	var target = "/my/dotranslit/?input=" + encodedInput + "&rules=" + ruletext +
+	  "&translit_type=" + translit_type ;
+	//xmlhttp.open("POST", target, true);
+	xmlhttp.open("GET", target, true);
+	var size = target.length;
+	xmlhttp.send(null);
+  }
+</script>
+
+  <script type="text/javascript">
+    function setTranslitOption(selector) {
+    }
+  </script>
+  <link rel="stylesheet" type="text/css" href="/css/keyboard.css" />
+
+  <style>{% for font in font_list %}
+    .vk-box, .vk-btn, .vk-cap, .vi-cap-i, .vk-sf-h, .vk-t, .vk-t-btn {
+        font-family: {{font.family}};
+    }{% endfor %}
+    </style>
+
+  
+  </head>
+<body onload="onPageLoaded()">
+  <div class="container">
+    <div class="span-1">  
+    </div>
+  <div class="span-16">
+    <h2>{{language}} Transliteration</h2>
+
+  Keyboard: <select onchange="onLayoutSelected(this.value)" id="setLayout">
+    {% for kb in kb_list %}
+    <option value="{{kb.shortName}}" select="">{{kb.longName}}</option>
+    {% endfor %}
+  </select>
+  <select onchange="setFontFamily(this.value)" id="fontSelector">
+    {% for font in font_list %}
+    <option value="{{font.family}}">{{font.longName}}</option>
+    {% endfor %}
+    <option value="Arial">Arial</option>
+  </select>
+  Size: <select onchange="onSizeSelected(this.value, 't1');" id="sizeSelector">
+    <option value="10px">10</option>
+    <option value="14px">14</option>
+    <option value="18px">18</option>
+    <option value="24px" selected>24</option>
+    <option value="32px">32</option>
+    <option value="48px">48</option>
+    <option value="48px">60</option>
+    <option value="72px">72</option>
+    <option value="96px">96</option>
+    <option value="120px">120</option>
+    <option value="240px">240</option>
+  </select>
+
+  <input type="button" value="Clear text" onclick="clearText()">
+  <br />
+
+  <!-- If an original encoding area is needed. -->
+  {% if encoded_div %} 
+  <textarea id="encodeArea" class='default-font' style="width:600px;height:300px;"
+            rows="10" dir="{{direction}}" spellcheck="false"></textarea>
+  <br />
+  <input type="button" value="Convert to Unicode text"
+    onclick="convertToUnicode('encodeArea', 't1');">
+  <hr>
+  {% endif %}
+
+  <div id="t1_div">
+    <textarea id="t1" style="width:600px;font-family:{{font_list.0.family}};resize:vertical;"
+      rows="4" spellcheck="false"
+      style="font-size:18px;"
+      dir="{{direction}}">{{test_data}}</textarea>
+    <br />
+
+    <!-- TESTING TRANSLIT -->
+    <div id="do_transliterate">
+      <div id="translit_controls"></div>
+      <input type="button" id="translit_test_button" value="Transliterate text"
+             onclick="requestTransliterate('t1', 'outputarea', 'rulearea', 'messagearea', 'summaryarea', 'translit_selector');">
+      Transliterator: <select onchange="setTranslitOption(this.value)" id="translit_selector">
+        {% for tlit in translit_rules_list %}
+        <option value="{{tlit.name}}">{{tlit.name}}</option>
+        {% endfor %}
+        <option value="All">All</option>
+      </select>
+      </div>
+    <br/>
+    <textarea id="outputarea" spellcheck="false" rows="2" columns="15"></textarea>
+    <textarea style="display:none;" id="rulearea" spellcheck="false" columns="15"></textarea>
+    <textarea style="display:none;" id="messagearea" spellcheck="false" columns="15"></textarea>
+    <textarea style="display:none;"id="summaryarea" spellcheck="false" columns="15"></textarea>
+  </div>
+  </div>
+
+  <div id="codepoint_div">
+    <hr>
+    <input type="button" value="Code points" onclick="showCodePoints()">
+<!--    <input type="button" value="All keys" onclick="fillAllKeys('t1', 'setLayout');"-->
+<!--    />-->
+    {% if variation_sequence %}
+       <input type="checkbox" name="vsToggle" id="toggleVS" checked
+      onchange="toggleConvertedVS('t1', toggleVS);">Toggle variation sequence<br />
+    {% endif %}
+    <br />
+    <textarea id="codepoints" class='default-font'
+     style="width:600px;height:100px;resize:vertical;" spellcheck="false"
+     rows="5"></textarea>
+  </div>
+    <input type="button" value="-> Unicode text" onclick="hexToOutput('codepoints', 't1');">
+  <br>
+
+  <div id="instruction_area">
+    <br />
+    <p id="kb_instructions"></p>
+  </div>
+  </div>
+
+  <div class="span-4 last">
+   {% if links %}
+   <h4>Useful links</h4>
+     <ul>
+   {% for link in links %}
+      <li>
+        <a href="{{link.ref}}" target="_blank">{{link.linkText}}</a>
+     </li>
+   {% endfor %}
+     </ul>
+   {% endif %}
+
+  </div>
+
+  <div>
+    <form id='mon_form' action="/feedback/" method="get">
+      <input type="submit" value="Send feedback" />
+      <input type="hidden" name='language' value='{{language}}'>
+      <input type="hidden" name='font' value=''>
+    </form>
+  </div>
+ </div>
+
+</body></html>
