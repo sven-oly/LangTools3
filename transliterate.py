@@ -33,7 +33,7 @@ import xml.etree.ElementTree as ET
 def ensure_unicode(x):
   if sys.version_info < (3, 0):
     what = type(x)
-    if what is not 'unicode':
+    if what != 'unicode':
       return x.decode('utf-8')
   return x
 
@@ -307,15 +307,24 @@ class Transliterate():
 
   def printSummary(self):
     # Print the statistics
-    print('%4d raw rules' % len(self.raw_rules))
-    print('%4d shortcuts ' % len(self.shortcuts))
-    print('%4d reduced ' % len(self.reduced))
-    print('%4d phaseStrings ' % len(self.phaseStrings))
-    print('%4d phaseList ' % len(self.phaseList))
+    result = []
+    rule_count = 0
+    for phase in self.phaseList:
+      rule_count += len(phase.rules)
+
+  # These are just text size.
+    # result.append('%4d raw rules' % len(self.raw_rules))
+    # result.append('%4d reduced ' % len(self.reduced))
+    result.append('Summary:')
+    result.append('%2d phases, %d rules, %d shortcuts  ' %
+                  (len(self.phaseList), rule_count, len(self.shortcuts)))
     index = 0
     for phase in self.phaseList:
-      print('  %3d rules in phase %2d' % (len(self.phaseList[index].rules), index))
+      result.append('%4d rules in phase %d' % (len(self.phaseList[index].rules), index))
       index += 1
+      for line in result:
+        print(line)
+    return ('\n').join(result)
 
   def printPhases(self):
     for phase in self.phaseStrings:

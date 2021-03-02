@@ -162,7 +162,7 @@ def main(argv=None):
     print('Cannot create transliterator')
     return
 
-  #trans.printSummary()
+  trans.printSummary()
 
   test_data = TestData(trans)
   output = test_data.test()

@@ -1,4 +1,4 @@
-
+// Utility functions for HTML and JavaScript
 function toggleDiv(id, toggle) {
     var obj = document.getElementById(id);
     var checkBox = document.getElementById(toggle);
@@ -17,11 +17,47 @@ function toggleVisible(id) {
       obj.style.display = 'none';
 }
 
+// Clears and sets focus for text area.
+function clearText(text_id) {
+  var field = document.getElementById(text_id);
+  field.value = '';
+  document.getElementById(text_id).focus();
+}
+
 // Copy text contents from area1 to area2.
 function copyText(area1Id, area2Id) {
   var obj1 = document.getElementById(area1Id);
   var obj2 = document.getElementById(area2Id);
   obj2.innerHTML = obj2.value = obj1.value;
+}
+
+// Shows codepoints for textarea in other textarea.
+function showCodePoints(text_id, codepoints_id) {
+  var src_field = document.getElementById(text_id);
+  var code_text = uplus(src_field.value);
+  var dest_field = document.getElementById(codepoints_id);
+  dest_field.value = code_text;
+  src_field.focus();
+}
+
+// Set language and font size
+function onLanguageSelected(newLangTag, textArea) {
+  var t1_element = document.getElementById(textArea);
+  t1_element.lang = newLangTag;
+}
+
+function onSizeSelected(newSize, textArea) {
+  var t1_element = document.getElementById(textArea);
+  t1_element.style.fontSize = newSize;
+}
+
+// Sets font for a text area.
+function setFontFamily(text_id, newFontFamily) {
+  setKeyCapsFont(newFontFamily);
+
+  var t1_element = document.getElementById(text_id);
+  t1_element.className = newFontFamily;
+  t1_element.style.fontFamily = newFontFamily; //  + ",Arial";
 }
 
 function utf16common(text, prefix, suffix, asciitoo, highlight_list)
@@ -92,9 +128,10 @@ function utf16common(text, prefix, suffix, asciitoo, highlight_list)
 
   function uplus(text)
   {
-    return utf16common(text, "", " ", true, diff_list)
+    return utf16common(text, "", " ", true, diff_list);
   }
 
+  // Burmese
   function isConsonant(num) {
     return (0x1000 <= num && num <= 0x102a) || num == 0x103f || num == 0x104e;
   }
@@ -112,135 +149,10 @@ function utf16common(text, prefix, suffix, asciitoo, highlight_list)
     return (0x102b <= num && num <= 0x1030) || num == 0x1032;
   }
 
-  function findAllDetectorDiffs() {
-    // Differences between the C++ detector any my simple Javascript version.
-    var diff_ids = new Array(0);
-    var diff_ids2 = new Array(0);
-    var index;
-    var myz_detect;
-    for (index = 0; index < data.length; index ++) {
-      myz_detect = (detectZawgyi(data[index][1]) > 0);
-      if (data[index][4] != myz_detect) {
-	if (myz_detect) {
-	    diff_ids.push(index);
-	} else {
-	  diff_ids2.push(index);
-	}
-      }
-    }
-      return diff_ids + ' ||| ' + diff_ids2;
-  }
-
-function identifyBadOriginalData() {
-    var bad_ids = new Array(0);
-    var index;
-    for (index = 0; index < data.length; index ++) {
-	if (orig_font[index][1] > 1 && orig_font[index][2] > 0) {
-	    bad_ids.push(index);
-	}
-    }
-    return bad_ids;
-}
-
-function identifyBadDetection() {
-    var orig_not_Z = new Array(0);
-    var orig_not_U = new Array(0);
-    var index;
-    for (index = 0; index < data.length; index ++) {
-	if (data[index][4] && orig_font[index][1] > 0) {
-	    // detected as Z but bad Z rendering
-	    orig_not_Z.push(index);
-	}
-	if (!data[index][4] && orig_font[index][2] > 0) {
-	    // detected as Z but bad Z rendering
-	    orig_not_U.push(index);
-	}
-    }
-    return orig_not_Z + ' | ' + orig_not_U;
-}
-
-function identifyBadConversion() {
-    var bad_U_render = new Array(0);
-    var converted_is_Z = new Array(0);
-    var index;
-    for (index = 0; index < data.length; index ++) {
-
-	if (data[index][4] && orig_font[index][1] == 0 && converted_font[index][2] > 0) {
-	    // detected as Z but bad Z rendering
-	    bad_U_render.push(index);
-	}
-	if (data[index][4] && orig_font[index][1] > 0 && detectZawgyi(data[index][2])) {
-	    // detected as Z but bad Z rendering
-	    converted_is_Z.push(index);
-	}
-    }
-	return bad_U_render + ' | ' +converted_is_Z;
-}
-
-// Using the ordering expecdted for Unicode code points, parse a string into syllables.
-function parseSyllable(text) {
-  var index = 0;
-  var ccode;
-  var sylStart, sylEnd;
-  sylStart = 0;
-  sylEnd = 0;
-
-  var prev = 0;
-  var prev2 = 0;
-
-  while (index < text.length) {
-    ccode =  text.charCodeAt(i);
-    index += 1;
-
-    if (ccode == 0x1004) {
-
-    }
-  }
-}
-
 // Constants
 var nondigits = "[^\u1040-\u1049]";
 var consonant = "[\u1000-\u1021]";
 var vowelsign = "[\u102d, \u102e, \u1032, \u102f, \u1030, \u102b, \u102c]";
-
-// ZAWGYI MYANMAR CONSONANT SIGN MEDIAL RA
-// This character has multiple representations in the Zawgyi font.
-var zawgyi_medialra = "[\u103B\u107E-\u1084]";
-
-// Translation of transliteration-based 5 pass conversion into Javascript.
-function g3ZawgyiConverter(zawgyi_in) {
-
-  // output = output.replace(patttern, replacement);
-
-}
-
-
-// Returns list of encoding detection rules that match the text.
-function matchG3DetectRules(text) {
-  var detect_diffs = new Array(0);
-  var index;
-  for (index = 0; index < data.length; index ++) {
-    var text = data[index][1];
-    var g3_detect = data[index][4];
-    if (matchZawgyiRegEx(text) != data[index][4]) {
-      detect_diffs.push(index);
-    }
-  }
-  return detect_diffs;
-}
-
-// Returns list of encoding detection rules that match the text.
-function matchG3Conversion(text) {
-  var detect_diffs = new Array(0);
-  var index;
-  for (index = 0; index < data.length; index ++) {
-    var js_converted_text =  convertZawgyiToUnicode(data[index][1]);
-    if (js_converted_text != data[index][2]) {
-      detect_diffs.push(index);
-    }
-  }
-  return detect_diffs;
-}
 
 function charsToHexString(text) {
   var nums = "";

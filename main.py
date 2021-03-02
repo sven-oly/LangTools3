@@ -95,11 +95,6 @@ def root():
     visits = fetch_visits(10)
     return render_template('index.html', visits=visits)
 
-@app.route('/t2/')
-def t2():
-    'test 2nd option'
-    return render_template('ind2.html')
-
 LanguageCode = 'my'
 Language = 'Burmese'
 kb_list = [
@@ -118,6 +113,7 @@ translit_rules_list = [
     {'name': 'Myanmar-Latin', 'rules': translit_burmese_rules.TRANSLIT_MY_LATIN,
      },
 ]
+
 # TEMPORARY: Start at Burmese Transliteration
 @app.route('/')
 @app.route('/translit/')
@@ -140,17 +136,19 @@ def dotranslit():
     # Switch on type of transliteration
     name = None
     translit = None
+    summary_text = ''
     if translit_type:
+        # This should be a dictionary index by type.
         for t in translit_rules_list:
             if t['name'] == translit_type:
                 name = t['name']
                 translit = transliterate.Transliterate(
                     t['rules'], debug=True)
+                summary_text = translit.printSummary()
     logging.info('Transliterator = %s, %s' % (name, translit))
     out_text = translit.transliterate(input)
     message = ''
     error = ''
-    summary_text = ''
     result = {
         'outText': out_text,
         #'outText' : outText,
