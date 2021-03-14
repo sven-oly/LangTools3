@@ -50,14 +50,12 @@ my_latin_expected = ['kyount',
 
 
 class TestData:
-  def __init__(self, trans):
-    self.translit = trans  # The transliterator to be applied
-
+  def __init__(self):
     # Burmese, Google Latin translit, Okell+ expected, English translation
     self.test_data = [
       [u'ဘဲ ဓာတ် ဂျင် သား', '', '', '', ''],
       [u'ဘဲ ', 'bhell', 'b-eh', 'yes', 'bɛ́'],
-      [u' ဓာတ်', 'dharat', 'd-', 'battery', 'daʔ'],
+      [u'ဓာတ်', 'dharat', 'd-', 'battery', 'daʔ'],
       [u'ဂျင်', 'gyin', 'j-', 'gin', 'dʑɪ̀ɰ̃'],
       [u'သား', 'sarr', 'dh-', 'son', 'ðá'],
       [u'ဂုဏ်', 'gun', 'g-', 'honor', 'ɡòʊɰ̃'],
@@ -108,7 +106,6 @@ class TestData:
       [u'ရိုက် တိုင်း', '', 'ai', '', 'ai'],
       [u'ကုတ် ကုန်', '', 'ou', '', 'oʊ'],
       [u'အခု', '', 'ə', '', 'əhku'],
-
     ]
 
     # Burmese, Google Latin translit, Okell+ expected, English translation
@@ -129,6 +126,9 @@ class TestData:
       ['ဖြတ်တောက်ပါတယ်။', 'hpyattout partaal', '', 'Cut', ''],
     ]
 
+  def test_cases(self):
+    return self.test_data
+
   def test(self):
     results = []
     for item in self.test_data:
@@ -143,7 +143,7 @@ def main(argv=None):
   # The transliterator object
   trans = None
 
-  # TODO: Test XML input and parsing
+  # Test XML input and parsing
   if len(argv) > 1:
     path = os.path.splitext(argv[1])
     base_file_name = os.path.basename(argv[1])
@@ -162,7 +162,7 @@ def main(argv=None):
     print('Cannot create transliterator')
     return
 
-  trans.printSummary()
+  trans.getPrintSummary(True)
 
   test_data = TestData(trans)
   output = test_data.test()

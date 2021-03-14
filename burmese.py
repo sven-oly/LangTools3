@@ -113,9 +113,6 @@ links = [
     {'linkText': 'Font conversion summary',
      'ref': '/my/encodingRules/'
     },
-    {'linkText': 'Diacritics',
-     'ref': '/my/diacritic/'
-     },
     {'linkText': 'Resources',
      'ref': '/my/downloads/'
     },

@@ -52,12 +52,10 @@ function onSizeSelected(newSize, textArea) {
 }
 
 // Sets font for a text area.
-function setFontFamily(text_id, newFontFamily) {
+function setFontFamily(output_area, newFontFamily) {
   setKeyCapsFont(newFontFamily);
-
-  var t1_element = document.getElementById(text_id);
-  t1_element.className = newFontFamily;
-  t1_element.style.fontFamily = newFontFamily; //  + ",Arial";
+  output_area.className = newFontFamily;
+  output_area.style.fontFamily = newFontFamily; //  + ",Arial";
 }
 
 function utf16common(text, prefix, suffix, asciitoo, highlight_list)

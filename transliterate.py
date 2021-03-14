@@ -6,12 +6,10 @@ from __future__ import print_function
 # For Python 2 and 3 compatibility
 #from builtins import chr
 
-
 import logging
 
 import re
 import sys
-import unicodedata
 import xml.etree.ElementTree as ET
 
 # Default transliteration framework.
@@ -90,7 +88,7 @@ class Phase():
       u'(?P<before_context>[^{]*)(?P<left_context_mark>{?)(?P<in_context>[^}>→]*)\
 (?P<right_context_mark>}?)(?P<after_context>[^>→]*)\
 [>→](?P<before_reposition>[^|]*)(?P<reposition_mark>\|?)(?P<after_reposition>[^;]*)'\
-'(?P<final_semicolon>;?)(\s*)(?P<comment>\#?.*)', re.UNICODE)
+'(?P<final_semicolon>;?)(\s*)(?P<comment>#?.*)', re.UNICODE)
 
     index = 0
     for rule1 in rulelist:
@@ -305,16 +303,13 @@ class Transliterate():
     self.start = 0
     self.limit = 0
 
-  def printSummary(self):
+  def getPrintSummary(self, do_print=False):
     # Print the statistics
     result = []
     rule_count = 0
     for phase in self.phaseList:
       rule_count += len(phase.rules)
 
-  # These are just text size.
-    # result.append('%4d raw rules' % len(self.raw_rules))
-    # result.append('%4d reduced ' % len(self.reduced))
     result.append('Summary:')
     result.append('%2d phases, %d rules, %d shortcuts  ' %
                   (len(self.phaseList), rule_count, len(self.shortcuts)))
@@ -322,8 +317,9 @@ class Transliterate():
     for phase in self.phaseList:
       result.append('%4d rules in phase %d' % (len(self.phaseList[index].rules), index))
       index += 1
-      for line in result:
-        print(line)
+      if do_print:
+        for line in result:
+          print(line)
     return ('\n').join(result)
 
   def printPhases(self):
@@ -498,6 +494,7 @@ class Transliterate():
       try:
         outstring, matching_rules_data = self.applyPhase(phase_index, instring, debug)
       except:
+        matching_rules_data = None
         e = sys.exc_info()[0]
         logging.error('!! Calling applyPhase Error e = %s. phase_index =%s, instring = %s' %
                       (e, phase_index, instring))

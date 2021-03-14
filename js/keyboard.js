@@ -30,14 +30,15 @@
     controller.addEventListener(
         'lat',
         function () {
-            setFontFamily(font_list[0]);
+            setFontFamily(input_area, font_list[0]);
         });
     input_area.focus();
 
     var selector = document.getElementById("setLayout");
     onLayoutSelected(selector.value);
 
-    setFontFamily(document.getElementById("fontSelector").value);
+    // setFontFamily(document.getElementById("fontSelector").value);
+    setFontFamily(input_area, document.getElementById("fontSelector").value);
     return controller;
   }
 

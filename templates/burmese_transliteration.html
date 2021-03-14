@@ -22,15 +22,11 @@
       font-weight:normal;
       font-style:normal;
     }
-    {% endfor %}
-  </style>
-
-  <style>
-   {% for font in font_list %}
     .{{font.family}} {
-    font-family: "{{font.family}},Arial";
-    font-size:18px;
+      font-family: "{{font.family}},Arial";
+      font-size:18px;
     }
+
     {% endfor %}
 
     .default-font {
@@ -43,9 +39,9 @@
   </style>
 
   <script src="/js/keyboard.js"></script>
+  <script src="/js/vk-debug.js"></script>
 
   <script src="/js/utils.js"></script>
-  <script src="/js/vk-debug.js"></script>
 
   <!-- JavaScript for XHTML with server side -->
   <script src="/js/request_transliterate.js"></script>
@@ -54,7 +50,7 @@
   <script src="/js/{{langTag}}Converter.js"></script>
 {% endif %}
 
-  <script>
+  <script type="text/javascript">
   // keyboard and font lists for selectors
   var kb_info = {
     {% for kb in kb_list %}{{kb.shortName}}: ["{{kb.shortName}}", "{{kb.longName}}", "{{kb.instructions}}" ],{%endfor%}
@@ -79,7 +75,12 @@
     var selector = document.getElementById("setLayout");
     onLayoutSelected(selector.value);
 
-    setFontFamily(text_id, document.getElementById("fontSelector").value);
+    setFontFamilyByID(text_id, document.getElementById("fontSelector").value);
+  }
+
+  function setFontFamilyByID(text_id, font_value) {
+    var text_obj = document.getElementById(text_id);
+    setFontFamily(text_obj, font_value);
   }
 
   function onLayoutSelected(layoutCode) {
@@ -93,17 +94,12 @@
       }
     }
 
-    function setKeyCapsFont(newFontFamily) {
-      var keycaps = document.getElementsByClassName("vk-cap");
-      for (var i = 0; i < keycaps.length; i++ ) {
-        keycaps[i].style.fontFamily = newFontFamily;
-      }
+  function setKeyCapsFont(newFontFamily) {
+    var keycaps = document.getElementsByClassName("vk-cap");
+    for (var i = 0; i < keycaps.length; i++ ) {
+      keycaps[i].style.fontFamily = newFontFamily;
     }
-
-    // Keyboard info.
-    var kb_info = {
-      {% for kb in kb_list %}{{kb.shortName}}: ["{{kb.longName}}", "{{kb.instructions}}" ],{%endfor%}
-    };
+  }
 
 {% if variation_sequence %}
 function toggleConvertedVS(text_area_id, toggle) {
@@ -120,15 +116,40 @@ function toggleConvertedVS(text_area_id, toggle) {
   text_area.innerHTML = text_area.value = new_text;
 }
 {% endif %}
-  </script>
 
-  <script type="text/javascript">
-    function setTranslitOption(selector) {
-      requestTransliterate('t1', 'outputarea', 'rulearea', 'messagearea', 'summaryarea', 'translit_selector');
+  function callTranslit(translit_selection) {
+    requestTransliterate(
+      't1', 'outputarea', 'rulearea', 'messagearea', 'summaryarea', translit_selection);
+    var type_output = document.getElementById('result_type');
+    type_output.innerHTML = 'Showing ' + translit_selection;
+  }
+
+  // Get data from edit rules area, if any.
+  function callTranslitEdited(translit_selection) {
+    requestTransliterate(
+      't1', 'outputarea', 'rule_edit_area', 'messagearea', 'summaryarea', translit_selection);
+    var type_output = document.getElementById('result_type');
+    type_output.innerHTML = 'Showing ' + translit_selection;
+  }
+
+  function setTranslitOption(selector) {
+    var translit_selection = document.getElementById('translit_selector').value;
+    callTranslit(translit_selection);
+  }
+  var test_cases = [{%for case in test_cases%}
+    [{% for item in case%} "{{item}}",{%endfor%}], {%endfor%}
+    ];
+
+  function loadTests(out_id) {
+    var out_area = document.getElementById(out_id);
+    var text_list = [];
+    for (var i=0; i < test_cases.length; i++) {
+      text_list.push((i+1) + " " + test_cases[i][0]);
     }
+    out_area.innerHTML = out_area.value = text_list.join('\n');
+  }
   </script>
   <link rel="stylesheet" type="text/css" href="/css/keyboard.css" />
-
   </head>
 
 <body onload="onPageLoaded('t1')">
@@ -141,10 +162,10 @@ function toggleConvertedVS(text_area_id, toggle) {
     Keyboard:
     <select onchange="onLayoutSelected(this.value)" id="setLayout">
       {% for kb in kb_list %}
-      <option value="{{kb.shortName}}" select="">{{kb.longName}}</option>
+      <option value="{{kb.shortName}}">{{kb.longName}}</option>
       {% endfor %}
     </select>
-    <select onchange="setFontFamily('t1', this.value)" id="fontSelector">
+    <select onchange="setFontFamilyByID('t1', this.value)" id="fontSelector">
       {% for font in font_list %}
       <option value="{{font.family}}">{{font.longName}}</option>
       {% endfor %}
@@ -178,30 +199,24 @@ function toggleConvertedVS(text_area_id, toggle) {
     {% endif %}
 
     <div id="t1_div">
-    <textarea id="t1" style="width:600px;height:100px;font-family:{{font_list.0.family}};resize:vertical;"
-              style="font-size:18px;"
+    <textarea id="t1" style="font-size:18px;width:600px;height:100px;font-family:{{font_list.0.family}};resize:vertical;"
               dir="{{direction}}">{{test_data}}</textarea>
       <br />
 
       <!-- TESTING TRANSLIT -->
-      <div id="do_transliterate">
-        <div id="translit_controls"></div>
-        <input type="button" id="translit_test_button" value="Transliterate text"
-               onclick="requestTransliterate('t1', 'outputarea', 'rulearea', 'messagearea', 'summaryarea', 'translit_selector');">
-        Transliterator: <select onchange="setTranslitOption(this.value)" id="translit_selector">
-        {% for tlit in translit_rules_list %}
-        <option value="{{tlit.name}}">{{tlit.name}}</option>
-        {% endfor %}
-        <option value="All">All</option>
-      </select>
-      </div>
-      <br/>
+      {% for tlit in translit_rules_list %}
+      <input type="button" id="translit_test_button" value="{{tlit.name}}"
+             onclick="callTranslit('{{tlit.name}}');">{% endfor %}
+    <input type="button" value="Load test data" onclick="loadTests('t1')">
+  </div>
+
+    <br/>
+      <h3 id='result_type'></h3>
       <textarea id="outputarea" placeholder="Transliterated result" style="width:600px;height:100px;"></textarea>
       <textarea style="display:none;" id="rulearea" style="width:600px;height:100px;"></textarea>
       <textarea style="display:none;" id="messagearea" style="width:600px;height:100px;"></textarea>
       <textarea style="display:none;" id="summaryarea" style="width:600px;height:100px;"></textarea>
     </div>
-  </div>
 
   <div id="codepoint_div">
     <hr>
@@ -216,17 +231,46 @@ function toggleConvertedVS(text_area_id, toggle) {
     <textarea id="codepoints" class='default-font'
               style="width:600px;height:100px;resize:vertical;" spellcheck="false"
               rows="5"></textarea>
+    <br />
+
+    <input type="button" value="-> Unicode text" onclick="hexToOutput('codepoints', 't1');">
+    <br />
   </div>
-  <input type="button" value="-> Unicode text" onclick="hexToOutput('codepoints', 't1');">
-  <br />
+  <!-- For displaying / editing rules and using them -->
+  <div id="rule_edit">
+
+    <!-- Controls
+    Get rule set.
+    Search for characters / patterns
+    Translit with edited rules
+    Divide rule sets into phases.
+    Save rules to local computer
+    Save to DB?
+    Compare
+    -->
+
+    <!-- area for rule display -->
+    <h4>Rules editing</h4>
+    Get Rules:       {% for tlit in translit_rules_list %}
+    <input type="button" id="translit_rule_button" value="{{tlit.name}}"
+           onclick="requestTransliterateRules('rule_edit_area', 'messagearea', '{{tlit.name}}');">{% endfor %}
+    <br />
+    <input type="button" id="request_translit_with_rules" value="Translit with edited rules"
+    onclick="callTranslitEdited('Custom rules');">
+    <br />
+
+    <textarea id="rule_edit_area"></textarea>
+  </div>
+
 
   <div id="instruction_area">
     <br />
     <p id="kb_instructions"></p>
   </div>
-</div>
+
 
   <div class="span-4 last">
+    LINKS
     {% if links %}
     <h4>Useful links</h4>
     <ul>
