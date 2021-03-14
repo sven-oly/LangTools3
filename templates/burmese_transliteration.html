@@ -1,18 +1,23 @@
 <!DOCTYPE html>
 <html><head>
-    <title>Burmese transliteration explorer</title>
+  <title>Burmese transliteration explorer</title>
 
   <link rel="stylesheet" href="/css/blueprint/screen.css" type="text/css" media="screen">
-  <link rel="stylesheet" href="/css/blueprint/print.css" type="text/css" media="print"> 
+  <link rel="stylesheet" href="/css/blueprint/print.css" type="text/css" media="print">
 
   <!--[if lt IE 8]>
-    <link rel="stylesheet" href="/css/blueprint/ie.css" type="text/css" media="screen, projection">
+  <link rel="stylesheet" href="/css/blueprint/ie.css" type="text/css" media="screen, projection">
   <![endif]-->
-    
+
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
   <link rel="stylesheet" type="text/css" href="/css/fonts.css">
+  <link rel="stylesheet" type="text/css" href="/css/keyboard.css" />
+
+  <!-- Tool for detecting and converting Zawygi -->
+  <script src="{{myanmar_tools_info.detector_url}}"></script>
+  <script src="{{myanmar_tools_info.converter_url}}"></script>
 
   <style>
    {% for font in font_list %}
@@ -35,27 +40,30 @@
     }
 
   .input {font-size:18px;}
-  .textarea {font-size:20px; resize:"vertical"; spellcheck:false; width:600px; height:100px;}
+  .textareas {font-size:20px; resize:"vertical"; spellcheck:false; width:600px; height:100px;
+      resize:vertical;}
   </style>
 
   <script src="/js/keyboard.js"></script>
   <script src="/js/vk-debug.js"></script>
-
+  <script type="text/javascript" src="/js/myzu.js"></script>
   <script src="/js/utils.js"></script>
 
   <!-- JavaScript for XHTML with server side -->
   <script src="/js/request_transliterate.js"></script>
 
-  {% if variation_sequence %}
-  <script src="/js/{{langTag}}Converter.js"></script>
-{% endif %}
-
   <script type="text/javascript">
+
+  const zawgyi_converter = new google_myanmar_tools.ZawgyiConverter();
+  const zawgyi_detector = new google_myanmar_tools.ZawgyiDetector();
+  myzu_initialize(zawgyi_detector, zawgyi_converter);
+
+
   // keyboard and font lists for selectors
-  var kb_info = {
+  const kb_info = {
     {% for kb in kb_list %}{{kb.shortName}}: ["{{kb.shortName}}", "{{kb.longName}}", "{{kb.instructions}}" ],{%endfor%}
   };
-  var font_list = [
+  const font_list = [
     {% for font in font_list %}"{{font.family}}",{% endfor %}
   ];
 
@@ -149,8 +157,7 @@ function toggleConvertedVS(text_area_id, toggle) {
     out_area.innerHTML = out_area.value = text_list.join('\n');
   }
   </script>
-  <link rel="stylesheet" type="text/css" href="/css/keyboard.css" />
-  </head>
+</head>
 
 <body onload="onPageLoaded('t1')">
 <div class="container">
@@ -188,61 +195,50 @@ function toggleConvertedVS(text_area_id, toggle) {
     <input type="button" value="Clear text" onclick="clearText('codepoints');clearText('t1');">
     <br />
 
-    <!-- If an original encoding area is needed. -->
-    {% if encoded_div %}
-    <textarea id="encodeArea" class='default-font'
-              rows="10" dir="{{direction}}" spellcheck="false"></textarea>
-    <br />
-    <input type="button" value="Convert to Unicode text"
-           onclick="convertToUnicode('encodeArea', 't1');">
-    <hr>
-    {% endif %}
-
     <div id="t1_div">
-    <textarea id="t1" style="font-size:18px;width:600px;height:100px;font-family:{{font_list.0.family}};resize:vertical;"
-              dir="{{direction}}">{{test_data}}</textarea>
-      <br />
+      <div></div>
+    <textarea id="t1" class="textareas"
+              style="font-size:18px;width:600px;height:100px;font-family:{{font_list.0.family}};resize:vertical;"
+              dir="{{direction}}" onchange="enterTestText('t1');">{{test_data}}</textarea>
+      <input type="button" id="check_zawgyi" value="check zawgyi" onclick="enterTestText('t1');" />
+      <span id='detectedZU'></span>
+      <input type="button" value="Convert" onclick="convertRequest('t1', 'Z', 't1');"/>
+      </div>
+    <br />
 
-      <!-- TESTING TRANSLIT -->
+      <!-- TRANSLIT options -->
       {% for tlit in translit_rules_list %}
       <input type="button" id="translit_test_button" value="{{tlit.name}}"
              onclick="callTranslit('{{tlit.name}}');">{% endfor %}
-    <input type="button" value="Load test data" onclick="loadTests('t1')">
-  </div>
+      <input type="button" value="Load test data" onclick="loadTests('t1')">
+      <input type="button" value="Show code points"
+             onclick="showCodePoints('t1', 'codepoints');toggleVisible('show_code_points');">
 
-    <br/>
-      <h3 id='result_type'></h3>
-      <textarea id="outputarea" placeholder="Transliterated result" style="width:600px;height:100px;"></textarea>
-      <textarea style="display:none;" id="rulearea" style="width:600px;height:100px;"></textarea>
-      <textarea style="display:none;" id="messagearea" style="width:600px;height:100px;"></textarea>
-      <textarea style="display:none;" id="summaryarea" style="width:600px;height:100px;"></textarea>
     </div>
+    <h3 id='result_type'></h3>
+    <textarea id="outputarea" class="textareas"placeholder="Transliterated result" style="width:600px;height:100px;"></textarea>
+    <textarea style="display:none;" id="rulearea" class="textareas"style="width:600px;height:100px;"></textarea>
+    <textarea style="display:none;" id="messagearea" class="textareas"style="width:600px;height:100px;"></textarea>
+    <textarea style="display:none;" id="summaryarea" class="textareas"style="width:600px;height:100px;"></textarea>
+  </div>
 
   <div id="codepoint_div">
     <hr>
-    <input type="button" value="Code points" onclick="showCodePoints('t1', 'codepoints')">
-    <!--    <input type="button" value="All keys" onclick="fillAllKeys('t1', 'setLayout');"-->
-    <!--    />-->
-    {% if variation_sequence %}
-    <input type="checkbox" name="vsToggle" id="toggleVS" checked
-           onchange="toggleConvertedVS('t1', toggleVS);">Toggle variation sequence<br />
-    {% endif %}
-    <br />
-    <textarea id="codepoints" class='default-font'
+    <div id="show_code_points" style="display:none;">
+    <textarea id="codepoints" class='default-font, textareas' style="display:none;"
               style="width:600px;height:100px;resize:vertical;" spellcheck="false"
               rows="5"></textarea>
-    <br />
-
-    <input type="button" value="-> Unicode text" onclick="hexToOutput('codepoints', 't1');">
-    <br />
+      <input type="button" value="-> Unicode text" onclick="hexToOutput('codepoints', 't1');">
+      <input type="button" value="Close" onclick="toggleVisible('show_code_points');">
+      <br />
+      <hr>
+    </div>
   </div>
   <!-- For displaying / editing rules and using them -->
   <div id="rule_edit">
 
     <!-- Controls
-    Get rule set.
     Search for characters / patterns
-    Translit with edited rules
     Divide rule sets into phases.
     Save rules to local computer
     Save to DB?
@@ -256,20 +252,12 @@ function toggleConvertedVS(text_area_id, toggle) {
            onclick="requestTransliterateRules('rule_edit_area', 'messagearea', '{{tlit.name}}');">{% endfor %}
     <br />
     <input type="button" id="request_translit_with_rules" value="Translit with edited rules"
-    onclick="callTranslitEdited('Custom rules');">
+           onclick="callTranslitEdited('Custom rules');">
     <br />
 
-    <textarea id="rule_edit_area"></textarea>
+    <textarea id="rule_edit_area" class="textareas"></textarea>
   </div>
-
-
-  <div id="instruction_area">
-    <br />
-    <p id="kb_instructions"></p>
-  </div>
-
-
-  <div class="span-4 last">
+  <div class="span-4">
     LINKS
     {% if links %}
     <h4>Useful links</h4>
@@ -283,5 +271,6 @@ function toggleConvertedVS(text_area_id, toggle) {
     {% endif %}
   </div>
 </div>
+
 
 </body></html>

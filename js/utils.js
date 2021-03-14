@@ -36,6 +36,7 @@ function showCodePoints(text_id, codepoints_id) {
   var src_field = document.getElementById(text_id);
   var code_text = uplus(src_field.value);
   var dest_field = document.getElementById(codepoints_id);
+  dest_field.style.display = "block";
   dest_field.value = code_text;
   src_field.focus();
 }
@@ -55,7 +56,9 @@ function onSizeSelected(newSize, textArea) {
 function setFontFamily(output_area, newFontFamily) {
   setKeyCapsFont(newFontFamily);
   output_area.className = newFontFamily;
-  output_area.style.fontFamily = newFontFamily; //  + ",Arial";
+  if (output_area.style) {
+    output_area.style.fontFamily = newFontFamily; //  + ",Arial";
+  }
 }
 
 function utf16common(text, prefix, suffix, asciitoo, highlight_list)

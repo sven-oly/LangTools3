@@ -9,13 +9,8 @@ $consonants = [\u1000-\u1021];
 ($consonants) \u103C\u1031\u102C\u1004\u103A  → | $1 yaung;
 """
 
-TRANSLIT_MY_OKELL_JW = u"""
-
+TRANSLIT_MY_OKELL_JW = u"""\
 # Burmese to Okell transliteration, with modifications by Julian Wheatley
-
-#
-# Definitions
-#
 
 # Dependent vowel signs
 $vs_AA = \u102B;

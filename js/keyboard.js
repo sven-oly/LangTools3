@@ -39,6 +39,7 @@
 
     // setFontFamily(document.getElementById("fontSelector").value);
     setFontFamily(input_area, document.getElementById("fontSelector").value);
+    setFontFamily('kbd', document.getElementById("fontSelector").value);
     return controller;
   }
 

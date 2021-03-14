@@ -137,6 +137,18 @@ burmese_links = [
 ]
 
 
+class DefaultData():
+    def __init__(self):
+        self.mm_tools_source = 'https://github.com/googlei18n/myanmar-tools'
+        self.detector_demo = 'https://sffc.github.io/myanmar-tools-demos/detector_demo.html'
+
+        myanmar_tools_path = 'https://ajax.googleapis.com/ajax/libs/myanmar-tools/'
+        self.detector_version = '1.2.1'
+        self.converter_version = '1.2.1'
+        # Note that min version seems broken.
+        self.detector_url = myanmar_tools_path + self.detector_version + '/zawgyi_detector.min.js'
+        self.converter_url = myanmar_tools_path + self.detector_version + '/zawgyi_converter.min.js'
+
 # From sample program. Not used now.
 @app.route('/root')
 def root():
@@ -214,6 +226,8 @@ def translit():
     test_data = 'ကြောင်ကြီးတစ်ကောင်'
     test_obj = transliterate_burmese_jw.TestData()
     test_cases = test_obj.test_data
+    myanmar_tools_info=DefaultData()
+
     return render_template(
         'burmese_transliteration.html', language='my',
         kb_list=kb_list,
@@ -221,7 +235,8 @@ def translit():
         font_list=unicode_font_list,
         links=burmese_links,
         translit_rules_list=translit_rules_list,
-        test_cases=test_cases
+        test_cases=test_cases,
+        myanmar_tools_info=myanmar_tools_info,
     )
 
 
