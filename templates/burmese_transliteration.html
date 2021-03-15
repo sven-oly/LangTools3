@@ -100,6 +100,8 @@
               area.innerHTML = area.value = info[1];
           }
       }
+      // Set font to that selected.
+      setFontFamilyByID('t1', document.getElementById("fontSelector").value);
     }
 
   function setKeyCapsFont(newFontFamily) {
@@ -132,10 +134,22 @@ function toggleConvertedVS(text_area_id, toggle) {
     type_output.innerHTML = 'Showing ' + translit_selection;
   }
 
+  function getEditedRulesText(div_id) {
+    // Assemble text from all the edit areas.
+    div = document.getElementById(div_id);
+    var areas = div.getElementsByTagName('textarea');
+    var rules_list = [];
+    for (area in areas) {
+      rules_list.push(areas[area].value);
+    }
+    return rules_list.join('::Null;\n');
+  }
+
   // Get data from edit rules area, if any.
   function callTranslitEdited(translit_selection) {
+    var edited_rules_text = getEditedRulesText("editDiv");
     requestTransliterate(
-      't1', 'outputarea', 'rule_edit_area', 'messagearea', 'summaryarea', translit_selection);
+      't1', 'outputarea', edited_rules_text, 'messagearea', 'summaryarea', translit_selection);
     var type_output = document.getElementById('result_type');
     type_output.innerHTML = 'Showing ' + translit_selection;
   }
@@ -147,6 +161,38 @@ function toggleConvertedVS(text_area_id, toggle) {
   var test_cases = [{%for case in test_cases%}
     [{% for item in case%} "{{item}}",{%endfor%}], {%endfor%}
     ];
+
+  function downloadEditedRules(div_id, filename_id) {
+    var filename = "rules.txt";
+    var edited_rules_text = getEditedRulesText(div_id);
+    filename = document.getElementById(filename_id).value;
+    // Set up the link
+    var link = document.createElement("a");
+    link.setAttribute("target","_blank");
+    if(Blob !== undefined) {
+        var blob = new Blob([edited_rules_text], {type: "text/plain"});
+        link.setAttribute("href", URL.createObjectURL(blob));
+    } else {
+        link.setAttribute("href","data:text/plain," + encodeURIComponent(edited_rules_text));
+    }
+    link.setAttribute("download",filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function uploadRules(filename_id, edit_div_id){
+  var fileToLoad = document.getElementById(filename_id).files[0];
+  // Should ask for confirmation to replace data.
+  var fileReader = new FileReader();
+  fileReader.onload = function(fileLoadedEvent){
+      var textFromFileLoaded = fileLoadedEvent.target.result;
+      //document.getElementById("inputTextToSave").value = textFromFileLoaded;
+      prepareRuleEditZones(textFromFileLoaded, edit_div_id);
+  };
+
+  fileReader.readAsText(fileToLoad, "UTF-8");
+}
 
   function loadTests(out_id) {
     var out_area = document.getElementById(out_id);
@@ -165,7 +211,7 @@ function toggleConvertedVS(text_area_id, toggle) {
   </div>
   <div class="span-16">
     <h2>{{language}} Transliteration</h2>
-
+    <div i'input_options'>
     Keyboard:
     <select onchange="onLayoutSelected(this.value)" id="setLayout">
       {% for kb in kb_list %}
@@ -194,7 +240,7 @@ function toggleConvertedVS(text_area_id, toggle) {
 
     <input type="button" value="Clear text" onclick="clearText('codepoints');clearText('t1');">
     <br />
-
+  </div>
     <div id="t1_div">
       <div></div>
     <textarea id="t1" class="textareas"
@@ -206,6 +252,7 @@ function toggleConvertedVS(text_area_id, toggle) {
       </div>
     <br />
 
+    <div id="translit options">
       <!-- TRANSLIT options -->
       {% for tlit in translit_rules_list %}
       <input type="button" id="translit_test_button" value="{{tlit.name}}"
@@ -213,14 +260,13 @@ function toggleConvertedVS(text_area_id, toggle) {
       <input type="button" value="Load test data" onclick="loadTests('t1')">
       <input type="button" value="Show code points"
              onclick="showCodePoints('t1', 'codepoints');toggleVisible('show_code_points');">
-
+    </div>
     </div>
     <h3 id='result_type'></h3>
     <textarea id="outputarea" class="textareas"placeholder="Transliterated result" style="width:600px;height:100px;"></textarea>
     <textarea style="display:none;" id="rulearea" class="textareas"style="width:600px;height:100px;"></textarea>
     <textarea style="display:none;" id="messagearea" class="textareas"style="width:600px;height:100px;"></textarea>
     <textarea style="display:none;" id="summaryarea" class="textareas"style="width:600px;height:100px;"></textarea>
-  </div>
 
   <div id="codepoint_div">
     <hr>
@@ -254,9 +300,18 @@ function toggleConvertedVS(text_area_id, toggle) {
     <input type="button" id="request_translit_with_rules" value="Translit with edited rules"
            onclick="callTranslitEdited('Custom rules');">
     <br />
+    <input type="button" id="download_rules" value="Download updated rules"
+           onclick="downloadEditedRules('editDiv', 'download_filename');">
+    <span>Download file name</span><input type="text" id="download_filename" name="Download filename">
+    <br/>
+    <input type="file" id="fileToLoad"></td>
+    <button onclick="uploadRules('fileToLoad', 'editDiv');">Load Selected File</button>
+    <!-- Stores original rules by editDiv text areas, below -->
+    <textarea id="rule_edit_area" style="display:none;" class="textareas"></textarea>
 
-    <textarea id="rule_edit_area" class="textareas"></textarea>
   </div>
+<div id="editDiv">
+</div>
   <div class="span-4">
     LINKS
     {% if links %}
