@@ -58,7 +58,12 @@ unicode_font_list = [
     {
         'family': 'Padauk',
         'longName': 'Padauk',
-        'source': '/    fonts/Myanmar/Padauk-Regular.ttf',
+        'source': '/fonts/Myanmar/Padauk-Regular.ttf',
+    },
+    {
+        'family': 'Padauk-book',
+        'longName': 'Padauk-book',
+        'source': '/fonts/Myanmar/Padauk-book.ttf',
     },
     {
         'family': 'NotoSerifMyanmar',
@@ -124,6 +129,16 @@ unicode_font_list = [
         'family': 'PyidaungsuBold',
         'longName': 'PyidaungsuBold',
         'source': '/fonts/Myanmar/Pyidaungsu-2.3_Bold.ttf',
+    },
+    {
+        'family': 'BeautiUNI-2',
+        'longName': 'BeautiUNI-2',
+        'source': '/fonts/Myanmar/BeautiUNI-2.ttf',
+    },
+    {
+        'family': 'BeautiUNI-6',
+        'longName': 'BeautiUNI-6',
+        'source': '/fonts/Myanmar/BeautiUNI-6.ttf',
     },
 ]
 
@@ -319,3 +334,18 @@ def getTranslitRules():
     }
     return_string = json.dumps(result)
     return return_string
+
+@app.route('/my/allfonts/', methods=['POST', 'GET'])
+def AllFontTest():
+    utext = request.args.get("utext")
+    encodedText = request.args.get("encodedText")
+    logging.info('AllFontTest utext =>%s<' % utext)
+
+    return render_template('allFonts.html',
+        scriptName=Language,
+        fontFamilies=unicode_font_list,
+        encodedText=encodedText,
+        utext=utext,
+        language=Language,
+        LanguageTag='my',
+    )

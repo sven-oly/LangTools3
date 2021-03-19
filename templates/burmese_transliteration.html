@@ -128,8 +128,9 @@ function toggleConvertedVS(text_area_id, toggle) {
 {% endif %}
 
   function callTranslit(translit_selection) {
+    const rule_text = document.getElementById('rulearea').value;
     requestTransliterate(
-      't1', 'outputarea', 'rulearea', 'messagearea', 'summaryarea', translit_selection);
+      't1', 'outputarea', rule_text, 'messagearea', 'summaryarea', translit_selection);
     var type_output = document.getElementById('result_type');
     type_output.innerHTML = 'Showing ' + translit_selection;
   }
@@ -139,7 +140,7 @@ function toggleConvertedVS(text_area_id, toggle) {
     div = document.getElementById(div_id);
     var areas = div.getElementsByTagName('textarea');
     var rules_list = [];
-    for (area in areas) {
+    for (var area = 0; area <  areas.length; area ++) {
       rules_list.push(areas[area].value);
     }
     return rules_list.join('::Null;\n');
@@ -202,6 +203,13 @@ function uploadRules(filename_id, edit_div_id){
     }
     out_area.innerHTML = out_area.value = text_list.join('\n');
   }
+
+  function showTextInFonts(text_area_id) {
+      const text_area = document.getElementById(text_area_id);
+      const text = text_area.value;
+      const target = "/my/allfonts/?utext=" + text;
+      window.open(target, "_blank");
+  }
   </script>
 </head>
 
@@ -249,6 +257,7 @@ function uploadRules(filename_id, edit_div_id){
       <input type="button" id="check_zawgyi" value="check zawgyi" onclick="enterTestText('t1');" />
       <span id='detectedZU'></span>
       <input type="button" value="Convert" onclick="convertRequest('t1', 'Z', 't1');"/>
+      <input type="button" value="Show text in all fonts" onclick="showTextInFonts('t1');"/>
       </div>
     <br />
 
