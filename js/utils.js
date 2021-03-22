@@ -48,8 +48,7 @@ function onLanguageSelected(newLangTag, textArea) {
 }
 
 function onSizeSelected(newSize, textArea) {
-  var t1_element = document.getElementById(textArea);
-  t1_element.style.fontSize = newSize;
+  textArea.fontSize = newSize;
 }
 
 // Sets font for a text area.

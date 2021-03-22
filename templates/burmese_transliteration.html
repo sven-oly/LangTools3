@@ -63,6 +63,9 @@
   const kb_info = {
     {% for kb in kb_list %}{{kb.shortName}}: ["{{kb.shortName}}", "{{kb.longName}}", "{{kb.instructions}}" ],{%endfor%}
   };
+  const kb_list = [
+    {% for kb in kb_list %}"{{kb.shortName}}",{%endfor%}
+  ];
   const font_list = [
     {% for font in font_list %}"{{font.family}}",{% endfor %}
   ];
@@ -75,7 +78,7 @@
   function onPageLoaded(text_id) {
     var input = document.getElementById(text_id);
 
-    controller = initializeKeyboard(input, kb_info, font_list);
+    controller = initializeKeyboard(input, kb_list, font_list);
 
     onSizeSelected(document.getElementById("sizeSelector").value, text_id);
     input.focus();
@@ -217,9 +220,9 @@ function uploadRules(filename_id, edit_div_id){
 <div class="container">
   <div class="span-1">
   </div>
-  <div class="span-16">
+  <div class="span-16" id="c16">
     <h2>{{language}} Transliteration</h2>
-    <div i'input_options'>
+    <div id='input_options'>
     Keyboard:
     <select onchange="onLayoutSelected(this.value)" id="setLayout">
       {% for kb in kb_list %}
@@ -254,9 +257,10 @@ function uploadRules(filename_id, edit_div_id){
     <textarea id="t1" class="textareas"
               style="font-size:18px;width:600px;height:100px;font-family:{{font_list.0.family}};resize:vertical;"
               dir="{{direction}}" onchange="enterTestText('t1');">{{test_data}}</textarea>
-      <input type="button" id="check_zawgyi" value="check zawgyi" onclick="enterTestText('t1');" />
+      <input type="button" id="check_zawgyi" value="check zawgyi" onclick="enterTestText('t1', 'detectedZU', 'undo_button');" />
       <span id='detectedZU'></span>
-      <input type="button" value="Convert" onclick="convertRequest('t1', 'Z', 't1');"/>
+      <input type="button" value="Convert" onclick="convertRequest('t1', 'Z', 't1', 'undo_button');"/>
+      <input type="button" id='undo_button' value="Undo Convert" disabled onclick="undoConvert('t1', 'undo_button');"/>
       <input type="button" value="Show text in all fonts" onclick="showTextInFonts('t1');"/>
       </div>
     <br />
@@ -269,7 +273,6 @@ function uploadRules(filename_id, edit_div_id){
       <input type="button" value="Load test data" onclick="loadTests('t1')">
       <input type="button" value="Show code points"
              onclick="showCodePoints('t1', 'codepoints');toggleVisible('show_code_points');">
-    </div>
     </div>
     <h3 id='result_type'></h3>
     <textarea id="outputarea" class="textareas"placeholder="Transliterated result" style="width:600px;height:100px;"></textarea>
@@ -302,12 +305,12 @@ function uploadRules(filename_id, edit_div_id){
 
     <!-- area for rule display -->
     <h4>Rules editing</h4>
-    Get Rules:       {% for tlit in translit_rules_list %}
+    Get Rules: {% for tlit in translit_rules_list %}
     <input type="button" id="translit_rule_button" value="{{tlit.name}}"
-           onclick="requestTransliterateRules('rule_edit_area', 'messagearea', '{{tlit.name}}');">{% endfor %}
+           onclick="requestTransliterateRules('rule_edit_area', 'messagearea', '{{tlit.name}}', 'request_translit_with_rules');">{% endfor %}
     <br />
     <input type="button" id="request_translit_with_rules" value="Translit with edited rules"
-           onclick="callTranslitEdited('Custom rules');">
+           onclick="callTranslitEdited('Custom rules');" disabled>
     <br />
     <input type="button" id="download_rules" value="Download updated rules"
            onclick="downloadEditedRules('editDiv', 'download_filename');">
@@ -317,12 +320,11 @@ function uploadRules(filename_id, edit_div_id){
     <button onclick="uploadRules('fileToLoad', 'editDiv');">Load Selected File</button>
     <!-- Stores original rules by editDiv text areas, below -->
     <textarea id="rule_edit_area" style="display:none;" class="textareas"></textarea>
+  <div id="editDiv"></div>
+  </div>
 
   </div>
-<div id="editDiv">
-</div>
   <div class="span-4">
-    LINKS
     {% if links %}
     <h4>Useful links</h4>
     <ul>
@@ -333,7 +335,9 @@ function uploadRules(filename_id, edit_div_id){
       {% endfor %}
     </ul>
     {% endif %}
-  </div>
+  </div id="c14">
+</div>
+
 </div>
 
 

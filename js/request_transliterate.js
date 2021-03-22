@@ -39,8 +39,18 @@ function requestTransliterate(inputarea, outputarea, rule_text, messagearea, sum
 
     // Set up the call
     const inputObj = document.getElementById(inputarea);
-    const inputtext = escape(inputObj.value);
-    const encodedInput = encodeURIComponent(inputObj.value);
+    // If a selection has been made, send only that part.
+    const start = inputObj.selectionStart;
+    const finish = inputObj.selectionEnd;
+    // obtain the selected text
+    var intext = "";
+    if (start != finish) {
+      intext = inputObj.value.substring(start, finish);
+    } else {
+      // Otherwise, the whole text.
+      intext = inputObj.value;
+    }
+    const encodedInput = encodeURIComponent(intext);
     const rules_to_send = encodeURIComponent(rule_text);
     const translit_type = translit_selection;
 
@@ -51,10 +61,13 @@ function requestTransliterate(inputarea, outputarea, rule_text, messagearea, sum
     xmlhttp.open("POST", url_head, true);
     xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     xmlhttp.send(args);
+
+    // Reset input focus
+    inputObj.focus();
 }
 
 // Javascript to request translit rules.
-function requestTransliterateRules(rulearea, messagearea, translit_selection) {
+function requestTransliterateRules(rulearea, messagearea, translit_selection, translist_button) {
     // Prepare for the call to the backendvar xmlhttp;
     if (window.XMLHttpRequest) { // code for IE7+, Firefox, Chrome, Opera, Safari
       xmlhttp=new XMLHttpRequest();
@@ -79,6 +92,12 @@ function requestTransliterateRules(rulearea, messagearea, translit_selection) {
         messageObj.value = messageObj.innerHTML = json_obj.message;
         rulearea_obj.value = rulearea_obj.innerHTML = json_obj.rulesText;
         prepareRuleEditZones(json_obj.rulesText, "editDiv");
+
+        // And turn on transliteration button
+        if (translist_button) {
+          var button = document.getElementById(translist_button);
+          button.disabled = false;
+        }
       }
     }
 

@@ -42,28 +42,47 @@ function compareConvert(area1,area2) {
   window.location=compareUrl;
 }
 
-function enterTestText(infield_id ) {
+function enterTestText(infield_id, detField_id) {
   const infield = document.getElementById(infield_id);
   const intext = infield.value;
 
   // Use myanmar-tools detection (https://github.com/googlei18n/myanmar-tools)
-
-  const detField = document.getElementById("detectedZU");
+  const detField = document.getElementById(detField_id);
   var detMsg = "Detected: ";
 
   var zawgyi_score = myanmar_tools_detector.getZawgyiProbability(intext);
-  zawgyi_score = 0.01 * Math.round(100.0 * zawgyi_score);
+  zawgyi_score = Math.round(100.0 * zawgyi_score);
   if (detField) {
-    detField.innerHTML = "Zawgyi score: " + zawgyi_score;;
+    detField.innerHTML = "Zawgyi score: " + zawgyi_score + "%";
   }
 }
 
+var pre_converted_strings = [];
+
+ function undoConvert(source, undo_button_id) {
+   //
+  source_element = document.getElementById(source);
+  if (pre_converted_strings.length > 0) {
+    source_element.value =  pre_converted_strings.pop();
+    if (pre_converted_strings.length == 0) {
+      undo_button = document.getElementById(undo_button_id);
+      undo_button.disabled = true;
+    }
+  } else {
+    alert('No undo data available!')
+  }
+}
  // Code to request transliteration (conversion) and handle the return.
-  function convertRequest(source, type, outputId) {
+  function convertRequest(source, type, outputId, undo_button_id) {
     // Get the text and prepare the call to server.
     source_element = document.getElementById(source);
 
     text_in = source_element.value;
+    pre_converted_strings.push(text_in);
+    if (undo_button_id) {
+      undo_button = document.getElementById(undo_button_id);
+      undo_button.disabled = false;
+    }
     var converted = false;
     var outText = "";
     if (type == "Z") {

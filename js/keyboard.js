@@ -16,9 +16,9 @@
 
     var x = i18n.input.keyboard.Controller;
 
-    onSizeSelected(document.getElementById("sizeSelector").value, 't1');
-    for (kb in kb_list) {
-      controller.loadLayout(kb);
+    onSizeSelected(document.getElementById("sizeSelector").value, input_area);
+    for (var kb =0; kb < kb_list.length; kb++) {
+      controller.loadLayout(kb_list[kb]);
     }
     controller.reposition(input_area, 3, 4, [5, 0, 0, 0]);
     controller.activateLayout('kb_list[0].shortName');
@@ -37,9 +37,12 @@
     var selector = document.getElementById("setLayout");
     onLayoutSelected(selector.value);
 
+    const fontSelector = document.getElementById("fontSelector");
     // setFontFamily(document.getElementById("fontSelector").value);
-    setFontFamily(input_area, document.getElementById("fontSelector").value);
-    setFontFamily('kbd', document.getElementById("fontSelector").value);
+    if (fontSelector) {
+        setFontFamily(input_area, fontSelector.value);
+        setFontFamily('kbd', fontSelector.value);
+    }
     return controller;
   }
 

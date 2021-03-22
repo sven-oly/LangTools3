@@ -101,11 +101,6 @@ unicode_font_list = [
         'source': '/fonts/Myanmar/NotoSerifMyanmar-Medium.ttf',
     },
     {
-        'family': 'NotoSerifMyanmarMedium',
-        'longName': 'Noto Serif Myanmar Medium',
-        'source': '/fonts/Myanmar/NotoSerifMyanmar-Medium.ttf',
-    },
-    {
         'family': 'MmrCensus',
         'longName': 'MMR Census',
         'source': '/fonts/Myanmar/mmrCensus.v5.minbe5.ttf',
@@ -139,15 +134,48 @@ unicode_font_list = [
         'family': 'BeautiUNI-6',
         'longName': 'BeautiUNI-6',
         'source': '/fonts/Myanmar/BeautiUNI-6.ttf',
+        'download_from': 'https://github.com/AungMyoKyaw/Myanmar-Unicode-Fonts',
+    },
+    {
+        'family': 'Cherry_Unicode',
+        'longName': 'Cherry Unicode',
+        'source': '/fonts/Myanmar/Cherry_Unicode.ttf',
+        'download_from': 'https://github.com/AungMyoKyaw/Myanmar-Unicode-Fonts',
+    },
+    {
+        'family': 'Jasmine_Unicode',
+        'longName': 'Jasmine Unicode',
+        'source': '/fonts/Myanmar/Jasmine_Unicode.ttf',
+        'download_from': 'https://github.com/AungMyoKyaw/Myanmar-Unicode-Fonts',
+    },
+    {
+        'family': 'MyanmarPaOhOne',
+        'longName': 'Myanmar PaOh One',
+        'source': '/fonts/Myanmar/MyanmarPaOhOne.ttf',
+        'download_from': 'https://github.com/AungMyoKyaw/Myanmar-Unicode-Fonts',
+    },
+    {
+        'family': 'PadaukGrandPro v2',
+        'longName': 'PadaukGrandPro v2',
+        'source': '/fonts/Myanmar/PadaukGrandPro v2.ttf',
+        'download_from': 'https://github.com/AungMyoKyaw/Myanmar-Unicode-Fonts'
     },
 ]
-
 burmese_links = [
     {'linkText': 'Unicode Myanmar',
      'ref': 'http://unicode.org/charts/PDF/U1000.pdf'
      },
     {'linkText': 'Zawgyi Converter',
      'ref': 'https://zawgyi-unicode-test.appspot.com/'
+     },
+    {'linkText': 'Frontier Myanmar News',
+     'ref': 'https://www.frontiermyanmar.net/mm/'
+     },
+    {'linkText': 'Burmese VOA News',
+     'ref': 'https://burmese.voanews.com/'
+     },
+    {'linkText': 'Burmese BBC News',
+     'ref': 'https://www.bbc.com/burmese'
      },
 ]
 
@@ -260,7 +288,6 @@ def dotranslit():
     rules = in_text = translit_type = None
     if request.method == 'POST':
         dict = request.form.to_dict()
-        print('*********** dict POST == %s' % dict.keys())
         try:
             rules = request.form.get('rules')  # Custom rule data.
             in_text = request.form.get('input')
@@ -341,11 +368,17 @@ def AllFontTest():
     encodedText = request.args.get("encodedText")
     logging.info('AllFontTest utext =>%s<' % utext)
 
+    font_list = sorted(unicode_font_list, key=fontSort)
     return render_template('allFonts.html',
         scriptName=Language,
         fontFamilies=unicode_font_list,
+        font_list=font_list,
         encodedText=encodedText,
+        kb_list=kb_list,
         utext=utext,
         language=Language,
         LanguageTag='my',
     )
+
+def fontSort(e):
+    return e['longName']

@@ -32,11 +32,25 @@
       font-size: 32px;
     }
    {% endfor %}
-   </style>
+  </style>
 
-   <script>
-   function fillAllWithUnicode() {
-     area_List = [{% for fontFam in fontFamilies %}"{{fontFam.family|lower}}_area",{% endfor %} "None"];
+<script src="/js/keyboard.js"></script>
+<script src="/js/vk-debug.js"></script>
+<script>
+
+  const kb_info = {
+    {% for kb in kb_list %}{{kb.shortName}}: ["{{kb.shortName}}", "{{kb.longName}}", "{{kb.instructions}}" ],{%endfor%}
+  };
+  const kb_list = [
+    {% for kb in kb_list %}"{{kb.shortName}}",{%endfor%}
+  ];
+  const font_list = [
+    {% for font in font_list %}"{{font.family}}",{% endfor %}
+  ];
+  font_list.sort();  // Alphabetical order
+
+  function fillAllWithUnicode() {
+     area_List = [{% for fontFam in font_list %}"{{fontFam.family|lower}}_area",{% endfor %}];
      for (var i = 0; i < area_List.length - 1; i ++) {
        var name = area_List[i];
        fillWithUnicode(name, null);
@@ -46,19 +60,17 @@
    function copyToAll(input_id) {
      var input_id = document.getElementById(input_id);
      var input_text = input_id.value;
-     area_List = [{% for fontFam in fontFamilies %}"{{fontFam.family|lower}}_area",{% endfor %} "None"];
-     for (var i = 0; i < area_List.length - 1; i ++) {
-       var name = area_List[i];
-       var output_id = document.getElementById(name);
-       output_id.innerHTML = input_text;
-       output_id.value = input_text;
+     area_List = [{% for fontFam in font_list %}"{{fontFam.family|lower}}_area",{% endfor %}];
+     for (var i = 0; i < area_List.length; i ++) {
+       var output_area = document.getElementById(area_List[i]);
+       output_area.innerHTML = output_area.value = input_text;
      }
    }
 
    function changeFontSize(selected) {
      var fontObj = document.getElementById(selected);
      var fontSize = fontObj.value;
-     {% for fontFam in fontFamilies %}
+     {% for fontFam in font_list %}
        var div = document.getElementById("{{fontFam.family|lower}}_area");
        div.style.fontSize = fontSize;
      {% endfor %}
@@ -66,8 +78,10 @@
 
    function onload() {
      copyToAll("input_area");
-     initKeyboard('input_area');
-  }
+     var input = document.getElementById('input_area');
+     controller = initializeKeyboard(input, kb_info, font_list);
+     var selector = document.getElementById("setLayout");
+     onLayoutSelected(selector.value);  }
 
   // DRAG FUNCTIONS
   function allowDrop(ev) {
@@ -91,33 +105,8 @@
     parent.insertBefore(movingNode, targetElement);
     //ev.target.appendChild(document.getElementById(data));
   }
-
-  var controller, visible = true;
-  function initKeyboard(textAreaID) {
-      var input = document.getElementById(textAreaID);
-      controller = new i18n.input.keyboard.Keyboard();
-      controller.loadLayout('{{LanguageTag}}');
-      controller.reposition(input, 2, 0, [1, 0, 0, 0]);
-      controller.register(input);
-      controller.addEventListener('kc', function() { visible = false; });
-      input.focus();
-      var selector = document.getElementById('selectKeyboard');
-      onLayoutSelected(selector, controller, textAreaID);
-  }
-
-  function onLayoutSelected(selector, this_controller, outputId) {
-    var layoutCode = selector.value;
-    if (this_controller) {
-      this_controller.activateLayout(layoutCode);
-    } else {  // The global.
-      controller.activateLayout(layoutCode);
-    }
-    document.getElementById(outputId).focus();
-  }
-
-   </script>
-
-   </head>
+  </script>
+  </head>
 
   <body onload="onload()">
 
@@ -133,12 +122,18 @@
           <textarea id="input_area" class="avant" cols="60" rows="1"
                     onchanged="copyToAll('input_area', null);">{{utext}}</textarea>
           <br />
+          Keyboard:
+          <select onchange="onLayoutSelected(this.value);" id="setLayout">
+              {% for kb in kb_list %}
+              <option value="{{kb.shortName}}">{{kb.longName}}</option>
+              {% endfor %}
+          </select>
           <input type="button"
                  onclick="copyToAll('input_area',
                     null);"
                  value="Copy to all" />
-          Font size: <select id='fontSize'
-                             onChange="changeFontSize('fontSize');">
+          Font size: <select id='sizeSelector'
+                             onChange="changeFontSize('sizeSelector');">
           <option value="10pt">10</option>
           <option value="12pt">12</option>
           <option value="14pt">14</option>
@@ -157,24 +152,16 @@
           <!--      <option value="{{osa}}">{{Language}} Unicode</option>-->
           <!--    </select>-->
       </div>
-  {% for fontFam in fontFamilies %}
+  {% for fontFam in font_list %}
   <div id="{{fontFam.family}}_div" draggable="true" ondragstart="drag(event)" ondrop="drop(event,this)"
     ondragover="allowDrop(event)">
-    &#9776;
-    <b>{{fontFam.family}}</b>
-    <br/><br/>
+    &#9776;<!-- The drag handle -->
       <text id="{{fontFam.family|lower}}_area" class="{{fontFam.family|lower}}"
       style="height=40px;font-size:32px; white-space:pre-wrap;" colums="80" rows="3">{{utext}}</text>
+      <span style="width:100px"></span><b>&nbsp;&nbsp;&nbsp;{{fontFam.longName}}</b></span>
+      <br /><br />
   </div>
   {% endfor %}
-
-  <div id='osageUnicodeSource'>
-    <br />
-    <h3>Unicode text:</h3>
-    <textarea id="input_area" class="avant" cols="60" rows="3"
-      onchanged="copyToAll('input_area', null);">{{utext}}</textarea>
-    <br />
-  </div>
 
   </div>
   </div>
